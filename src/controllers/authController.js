@@ -13,7 +13,8 @@ exports.signup = async (req, res) => {
         });
     } 
     catch (error) {
-        return res.status(500).json({
+        const errorStatus = error.statusCode || 500;
+        return res.status(errorStatus).json({
             success: false,
             message: error.message || 'Something went wrong',
         });
@@ -33,7 +34,8 @@ exports.login = async (req, res) => {
         });
     } 
     catch (error) {
-        return res.status(500).json({
+        const errorStatus = error.statusCode || 500;
+        return res.status(errorStatus).json({
             success: false,
             message: error.message || 'Something went wrong',
         });
