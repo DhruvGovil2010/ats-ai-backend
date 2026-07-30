@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User.js');
 const redisClient = require('../config/redis.js');
+const env = require('../config/env.js');
 const { generateAccessToken, generateRefreshToken } = require('../utils/generateTokens.js');
 
 const SALT_ROUNDS = 10;
