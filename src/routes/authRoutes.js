@@ -8,6 +8,6 @@ const { verifyJWT } = require('../middleware/authMiddleware.js');
 router.post('/signup', signupValidator, signup);
 router.post('/login', loginValidator, login);
 router.post('/refresh', refresh);
-router.post('/logout', verifyJWT, logout);
+router.get('/logout', verifyJWT, logout);
 
 module.exports = router;
