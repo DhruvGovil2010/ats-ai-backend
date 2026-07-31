@@ -1,6 +1,6 @@
 const authService = require('../services/authService.js');
 
-exports.signup = async (req, res) => {
+exports.signup = async (req, res, next) => {
     try {
         const { name, email, password, role } = req.body;
 
@@ -17,7 +17,7 @@ exports.signup = async (req, res) => {
     }
 };
 
-exports.login = async (req, res) => {
+exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
@@ -34,7 +34,7 @@ exports.login = async (req, res) => {
     }
 };
 
-exports.refresh = async (req, res) => {
+exports.refresh = async (req, res, next) => {
     try {
         const { refreshToken } = req.body;
 
@@ -51,7 +51,7 @@ exports.refresh = async (req, res) => {
     }
 };
 
-exports.logout = async (req, res) => {
+exports.logout = async (req, res, next) => {
     try {
         const userId = req.user.id;
 
