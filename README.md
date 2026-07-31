@@ -126,7 +126,7 @@ npm test
 ## Roadmap / Build Log
 
 - [x] Project setup, folder structure, health check endpoint
-- [ ] Auth (signup, login, refresh, logout)
+- [x] Auth (signup, login, refresh, logout)
 - [ ] Job CRUD + search/filter + pagination
 - [ ] Application flow + duplicate prevention
 - [ ] Redis caching on job search
