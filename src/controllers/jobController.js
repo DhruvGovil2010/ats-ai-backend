@@ -53,6 +53,24 @@ exports.closeJob = async (req, res, next) => {
     }
 };
 
+exports.searchJobs = async (req, res, next) => {
+    try {
+        const { skills, location, experienceLevel, cursor, limit } = req.query;
+
+        const result = await jobService.searchJobs({ skills, location, experienceLevel, cursor, limit });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Jobs fetched successfully',
+            totalJobs: result.jobs.length,
+            data: result,
+        });
+    }
+    catch (error) {
+        return next(error);
+    }
+};
+
 exports.getJobById = async (req, res, next) => {
     try {
         const { id } = req.params;

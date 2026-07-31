@@ -66,3 +66,39 @@ exports.getJobById = async (jobId) => {
 
     return job;
 };
+
+exports.searchJobs = async ({ skills, location, experienceLevel, cursor, limit }) => {
+    const query = { status: 'open' };
+
+    if (skills) {
+        const skillsArray = skills.split(',').map((skill) => skill.trim());
+        query.skillsRequired = { $in: skillsArray };
+    }
+
+    if (location) {
+        query.location = { $regex: location, $options: 'i' };
+    }
+
+    if (experienceLevel) {
+        query.experienceLevel = experienceLevel.toLowerCase();
+    }
+
+    if (cursor) {
+        query.createdAt = { $lt: new Date(cursor) };
+    }
+
+    const pageLimit = Math.min(parseInt(limit, 10) || 10, 50);
+
+    const jobs = await Job.find(query)
+        .sort({ createdAt: -1 })
+        .limit(pageLimit);
+
+    const nextCursor = jobs.length === pageLimit
+        ? jobs[jobs.length - 1].createdAt
+        : null;
+
+    return {
+        jobs,
+        nextCursor,
+    };
+};
