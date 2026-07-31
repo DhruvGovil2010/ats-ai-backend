@@ -1,4 +1,4 @@
-const authService = require('../services/authService');
+const authService = require('../services/authService.js');
 
 exports.signup = async (req, res) => {
     try {
@@ -13,11 +13,7 @@ exports.signup = async (req, res) => {
         });
     }
     catch (error) {
-        const errorStatus = error.statusCode || 500;
-        return res.status(errorStatus).json({
-            success: false,
-            message: error.message || 'Something went wrong',
-        });
+        return next(error);
     }
 };
 
@@ -34,11 +30,7 @@ exports.login = async (req, res) => {
         });
     }
     catch (error) {
-        const errorStatus = error.statusCode || 500;
-        return res.status(errorStatus).json({
-            success: false,
-            message: error.message || 'Something went wrong',
-        });
+        return next(error);
     }
 };
 
@@ -53,13 +45,9 @@ exports.refresh = async (req, res) => {
             message: 'Access token refreshed successfully',
             data: result,
         });
-    } 
+    }
     catch (error) {
-        const statusCode = error.statusCode || 500;
-        return res.status(statusCode).json({
-            success: false,
-            message: error.message || 'Something went wrong',
-        });
+        return next(error);
     }
 };
 
@@ -73,12 +61,8 @@ exports.logout = async (req, res) => {
             success: true,
             message: 'Logged out successfully',
         });
-    } 
+    }
     catch (error) {
-        const statusCode = error.statusCode || 500;
-        return res.status(statusCode).json({
-            success: false,
-            message: error.message || 'Something went wrong',
-        });
+        return next(error);
     }
 };

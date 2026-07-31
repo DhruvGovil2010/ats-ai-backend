@@ -1,7 +1,9 @@
 const express = require('express');
-const app = express();
 
 const authRoutes = require('./routes/authRoutes.js');
+const { errorHandler } = require('./middleware/errorHandler.js');
+
+const app = express();
 // Core middleware
 app.use(express.json());
 
@@ -11,5 +13,7 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+
+app.use(errorHandler);
 
 module.exports = app;
