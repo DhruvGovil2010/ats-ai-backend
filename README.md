@@ -127,8 +127,8 @@ npm test
 
 - [x] Project setup, folder structure, health check endpoint
 - [x] Auth (signup, login, refresh, logout)
-- [ ] Job CRUD + search/filter + pagination
-- [ ] Application flow + duplicate prevention
+- [x] Job CRUD + search/filter + pagination
+- [x] Application flow + duplicate prevention
 - [ ] Redis caching on job search
 - [ ] BullMQ async queue + worker
 - [ ] AI resume parsing

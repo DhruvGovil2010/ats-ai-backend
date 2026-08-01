@@ -52,3 +52,40 @@ exports.withdrawApplication = async (req, res, next) => {
         return next(error);
     }
 };
+
+exports.getApplicantsForJob = async (req, res, next) => {
+    try {
+        const recruiterId = req.user.id;
+        const { jobId } = req.params;
+
+        const applications = await applicationService.getApplicantsForJob(jobId, recruiterId);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Applicants fetched successfully',
+            data: applications,
+        });
+    }
+    catch (error) {
+        return next(error);
+    }
+};
+
+exports.updateApplicationStatus = async (req, res, next) => {
+    try {
+        const recruiterId = req.user.id;
+        const { id } = req.params;
+        const { status } = req.body;
+
+        const application = await applicationService.updateApplicationStatus(id, recruiterId, status);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Application status updated successfully',
+            data: application,
+        });
+    }
+    catch (error) {
+        return next(error);
+    }
+};
