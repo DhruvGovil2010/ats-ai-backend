@@ -30,7 +30,7 @@ exports.updateJob = async (jobId, recruiterId, updates) => {
     return job;
 };
 
-exports.closeJob = async (jobId, recruiterId) => {
+exports.updateJobStatus = async (jobId, recruiterId) => {
     const job = await Job.findById(jobId);
 
     if (!job) {
@@ -39,13 +39,21 @@ exports.closeJob = async (jobId, recruiterId) => {
         throw error;
     }
 
+    const jobStatus = job.status;
+
     if (job.postedBy.toString() !== recruiterId.toString()) {
-        const error = new Error('You are not authorized to close this job');
+
+        let er = `You are not authorized to close this job`;
+        if (jobStatus === 'closed') {
+            er = `You are not authorized to open this job`;
+        }
+
+        const error = new Error(er);
         error.statusCode = 403;
         throw error;
     }
 
-    job.status = 'closed';
+    job.status = jobStatus === 'closed' ? 'open' : 'closed';
     await job.save();
 
     return job;

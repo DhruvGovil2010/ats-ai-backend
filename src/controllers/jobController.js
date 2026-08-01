@@ -35,16 +35,21 @@ exports.updateJob = async (req, res, next) => {
     }
 };
 
-exports.closeJob = async (req, res, next) => {
+exports.updateJobStatus = async (req, res, next) => {
     try {
         const recruiterId = req.user.id;
         const { id } = req.params;
 
-        const job = await jobService.closeJob(id, recruiterId);
+        const job = await jobService.updateJobStatus(id, recruiterId);
+
+        let message = 'Job closed successfully';
+        if (job.status === 'open') {
+            message = 'Job opened successfully';
+        }
 
         return res.status(200).json({
             success: true,
-            message: 'Job closed successfully',
+            message,
             data: job,
         });
     }
