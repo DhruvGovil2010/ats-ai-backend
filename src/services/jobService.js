@@ -1,10 +1,34 @@
 const Job = require('../models/Job.js');
+const redisClient = require('../config/redis.js');
+
+const CACHE_TTL_SECONDS = 60;
+
+const buildSearchCacheKey = ({ skills, location, experienceLevel, cursor, limit }) => {
+    const filters = { skills, location, experienceLevel, cursor, limit };
+
+    const keyParts = Object.keys(filters)
+        .filter((key) => filters[key])
+        .sort()
+        .map((key) => `${key}=${filters[key]}`);
+
+    return `jobsearch:${keyParts.join(':')}`;
+};
+
+const clearSearchCache = async () => {
+    const keys = await redisClient.keys('jobsearch:*');
+
+    if (keys.length > 0) {
+        await redisClient.del(...keys);
+    }
+};
 
 exports.createJob = async (jobData, recruiterId) => {
     const job = await Job.create({
         ...jobData,
         postedBy: recruiterId,
     });
+
+    await clearSearchCache();
 
     return job;
 };
@@ -26,6 +50,8 @@ exports.updateJob = async (jobId, recruiterId, updates) => {
 
     Object.assign(job, updates);
     await job.save();
+
+    await clearSearchCache();
 
     return job;
 };
@@ -56,6 +82,8 @@ exports.updateJobStatus = async (jobId, recruiterId) => {
     job.status = jobStatus === 'closed' ? 'open' : 'closed';
     await job.save();
 
+    await clearSearchCache();
+
     return job;
 };
 
@@ -76,6 +104,13 @@ exports.getJobById = async (jobId) => {
 };
 
 exports.searchJobs = async ({ skills, location, experienceLevel, cursor, limit }) => {
+    const cacheKey = buildSearchCacheKey({ skills, location, experienceLevel, cursor, limit });
+
+    const cachedResult = await redisClient.get(cacheKey);
+    if (cachedResult) {
+        return JSON.parse(cachedResult);
+    }
+
     const query = { status: 'open' };
 
     if (skills) {
@@ -105,8 +140,9 @@ exports.searchJobs = async ({ skills, location, experienceLevel, cursor, limit }
         ? jobs[jobs.length - 1].createdAt
         : null;
 
-    return {
-        jobs,
-        nextCursor,
-    };
+    const result = { jobs, nextCursor };
+
+    await redisClient.set(cacheKey, JSON.stringify(result), 'EX', CACHE_TTL_SECONDS);
+
+    return result;
 };
