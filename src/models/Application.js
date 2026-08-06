@@ -13,11 +13,14 @@ const applicationSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'reviewed', 'shortlisted', 'rejected', 'withdrawn'],
+        enum: ['pending', 'parsed', 'reviewed', 'shortlisted', 'rejected', 'withdrawn'],
         default: 'pending',
     },
     resumeFileUrl: {
         type: String,
+    },
+    parsedResumeData: {
+        type: mongoose.Schema.Types.Mixed,
     },
 }, { timestamps: true }
 );

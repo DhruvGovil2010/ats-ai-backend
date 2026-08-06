@@ -9,7 +9,10 @@ const connection = new IORedis(env.REDIS_URL, {
 const resumeQueue = new Queue('resume-processing', { connection });
 
 exports.addResumeJob = async (data) => {
-    const job = await resumeQueue.add('parse-resume', data);
+    const job = await resumeQueue.add('parse-resume', data, {
+        attempts: 3,
+        backoff: { type: 'exponential', delay: 5000 },
+    });
     return job;
 };
 
