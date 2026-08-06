@@ -1,9 +1,10 @@
 const Application = require('../models/Application.js');
 const Job = require('../models/Job.js');
+const { addResumeJob } = require('../queues/resumeQueue.js');
 
 const RECRUITER_ALLOWED_STATUSES = ['reviewed', 'shortlisted', 'rejected'];
 
-exports.applyToJob = async (jobId, candidateId) => {
+exports.applyToJob = async (jobId, candidateId, resumeFileUrl) => {
     const job = await Job.findById(jobId);
 
     if (!job) {
@@ -22,6 +23,12 @@ exports.applyToJob = async (jobId, candidateId) => {
         const application = await Application.create({
             jobId,
             candidateId,
+            resumeFileUrl,
+        });
+
+        await addResumeJob({
+            applicationId: application._id.toString(),
+            resumeFileUrl,
         });
 
         return application;

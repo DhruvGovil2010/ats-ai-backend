@@ -4,8 +4,9 @@ exports.applyToJob = async (req, res, next) => {
     try {
         const candidateId = req.user.id;
         const { jobId } = req.params;
+        const resumeFileUrl = req.file ? req.file.path : null;
 
-        const application = await applicationService.applyToJob(jobId, candidateId);
+        const application = await applicationService.applyToJob(jobId, candidateId, resumeFileUrl);
 
         return res.status(201).json({
             success: true,
