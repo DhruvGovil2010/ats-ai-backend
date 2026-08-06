@@ -13,13 +13,13 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = function (req, file, cb) {
-  const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+  const allowedTypes = ['application/pdf'];
 
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   }
   else {
-    cb(new Error('Only PDF and DOC/DOCX files are allowed'), false);
+    cb(new Error('Only PDF files are allowed'), false);
   }
 };
 

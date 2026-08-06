@@ -13,7 +13,7 @@ const applicationSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'parsed', 'reviewed', 'shortlisted', 'rejected', 'withdrawn'],
+        enum: ['pending', 'parsed', 'parse_failed', 'reviewed', 'shortlisted', 'rejected', 'withdrawn'],
         default: 'pending',
     },
     resumeFileUrl: {
@@ -21,6 +21,9 @@ const applicationSchema = new mongoose.Schema({
     },
     parsedResumeData: {
         type: mongoose.Schema.Types.Mixed,
+    },
+    parsedAt: {
+        type: Date,
     },
 }, { timestamps: true }
 );

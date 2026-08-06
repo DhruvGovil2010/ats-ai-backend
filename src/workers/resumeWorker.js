@@ -2,7 +2,7 @@ const { Worker } = require('bullmq');
 const mongoose = require('mongoose');
 const IORedis = require('ioredis');
 const fs = require('fs');
-const pdfParse = require('pdf-parse');
+const { PDFParse } = require('pdf-parse');
 const { GoogleGenAI } = require('@google/genai');
 const env = require('../config/env.js');
 const { RESUME_PARSE_PROMPT } = require('../config/aiPrompts.js');
@@ -25,26 +25,37 @@ const resumeWorker = new Worker(
 
         console.log(`Processing job ${job.id} for application ${applicationId}`);
 
-        const fileBuffer = fs.readFileSync(resumeFileUrl);
-        const parsedPdf = await pdfParse(fileBuffer);
-        const resumeText = parsedPdf.text;
+        try {
+            const fileBuffer = fs.readFileSync(resumeFileUrl);
+            const parser = new PDFParse({ data: fileBuffer });
+            const parsedPdf = await parser.getText();
+            const resumeText = parsedPdf.text;
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-3.5-flash',
-            contents: RESUME_PARSE_PROMPT + resumeText,
-        });
+            const response = await ai.models.generateContent({
+                model: 'gemini-3.5-flash',
+                contents: RESUME_PARSE_PROMPT + resumeText,
+            });
 
-        const rawOutput = response.text.replace(/```json|```/g, '').trim();
-        const parsedData = JSON.parse(rawOutput);
+            const rawOutput = response.text.replace(/```json|```/g, '').trim();
+            const parsedData = JSON.parse(rawOutput);
 
-        await Application.findByIdAndUpdate(applicationId, {
-            parsedResumeData: parsedData,
-            status: 'parsed',
-        });
+            await Application.findByIdAndUpdate(applicationId, {
+                parsedResumeData: parsedData,
+                status: 'parsed',
+                parsedAt: new Date(),
+            });
 
-        console.log(`Finished processing job ${job.id}`);
+            console.log(`Finished processing job ${job.id}`);
 
-        return { status: 'processed', applicationId };
+            return { status: 'processed', applicationId };
+        }
+        catch (error) {
+            await Application.findByIdAndUpdate(applicationId, {
+                status: 'parse_failed',
+            });
+
+            throw error;
+        }
     },
     { connection }
 );
